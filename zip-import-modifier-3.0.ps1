@@ -40,3 +40,5 @@ if (Test-Path $7ZipExecutablePath) {
 } else {
     Write-Host "7-Zip executable not found. Please provide the correct path to 7z.exe."
 }
+
+# \|([^|]+)\|([^|]+)\|
