@@ -29,7 +29,9 @@ foreach ($zipFile in $zipFiles) {
     $replacementText | Set-Content -Path $tempFile -Force
 
     # Update the content of Import.txt in the zip archive
-    & $7ZipPath a -p$password $zipFile.FullName $tempFile -si -so | & $7ZipPath u -p$password -si $zipFile.FullName $importTxtPath
+    $updateCommand = "& '$7ZipPath' a -p$password $zipFile.FullName $tempFile -si -so"
+    $updateOutput = Invoke-Expression -Command $updateCommand
+    & $7ZipPath u -p$password -si $zipFile.FullName $importTxtPath <<< $updateOutput
 
     Remove-Item -Path $tempFile -Force
 
@@ -37,4 +39,5 @@ foreach ($zipFile in $zipFiles) {
 
     Write-Host "-------------------------------------"
 }
+
 
