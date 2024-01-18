@@ -20,24 +20,20 @@ foreach ($zipFile in $zipFiles) {
     # Prompt user for password
     $password = Read-Host "Enter the password for $($zipFile.Name)"
 
-    # Search for Import.txt in the zip file
-    $importTxtPath = & "$7ZipPath" l -p$password $zipFile.FullName | Where-Object { $_ -match 'Import.txt' } | ForEach-Object { $_ -replace '\s+', ' ' } | Out-Null; $matches[0]
+    # Use 7-Zip to update the content of Import.txt in the zip archive
+    $importTxtPath = "Import.txt"
+    $replacementText = Get-UserInput
 
-    if ($importTxtPath) {
-        Write-Host "Found Import.txt at: $importTxtPath"
+    # Create a temporary file to hold the replacement text
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $replacementText | Set-Content -Path $tempFile -Force
 
-        # Prompt user for replacement text
-        $replacementText = Get-UserInput
+    $updateCommand = "& '$7ZipPath' a -p$password $zipFile.FullName $tempFile -si -so"
+    & $updateCommand | & "$7ZipPath" u -p$password -si $zipFile.FullName $importTxtPath
 
-        # Use 7-Zip to update the content of Import.txt in the zip archive
-        $updateCommand = "& '$7ZipPath' a -p$password $zipFile.FullName $importTxtPath -si -so"
-        $newContent = "$replacementText`r`n" + (& $updateCommand | Out-String)
-        $newContent | & "$7ZipPath" u -p$password -si $zipFile.FullName Import.txt
-        Write-Host "Replacement completed."
-    }
-    else {
-        Write-Host "Import.txt not found in the zip file."
-    }
+    Remove-Item -Path $tempFile -Force
+
+    Write-Host "Replacement completed."
 
     Write-Host "-------------------------------------"
 }
