@@ -29,7 +29,8 @@ foreach ($zipFile in $zipFiles) {
     $replacementText | Set-Content -Path $tempFile -Force
 
     $updateCommand = "& '$7ZipPath' a -p$password $zipFile.FullName $tempFile -si -so"
-    Invoke-Expression -Command $updateCommand | Invoke-Expression -Command "$7ZipPath u -p$password -si $($zipFile.FullName) $($importTxtPath)"
+    Invoke-Expression -Command $updateCommand
+    Invoke-Expression -Command "$7ZipPath u -p$password -si $($zipFile.FullName) $($importTxtPath)"
 
     Remove-Item -Path $tempFile -Force
 
